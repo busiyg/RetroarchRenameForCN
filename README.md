@@ -8,14 +8,14 @@
 
 ## 运行
 - 视频教程：https://space.bilibili.com/332938511
-- 可以直接从Releases中下载打包好的exe，也可以自己配置环境运行源码
+- 可以直接从[Releases](https://github.com/busiyg/RetroarchRenameForCN/releases)中下载打包好的exe，也可以自己配置环境运行源码
 ```bash
 pip install rapidfuzz pandas
 python ROM_Batch_Renamer.py
 ```
 
-## 支持平台
-- FC,SFC,GB,GBC,GBA,NDS,3DS,New 3DS，Wii，Wii U，PS1，PSP
+## 平台
+- FC,SFC,GB,GBC,GBA,NDS,3DS,New 3DS,Wii,Wii U,PS1,PSP
 
 ## 致谢
 https://github.com/yingw/rom-name-cn 项目提供的中文游戏名称数据库。
