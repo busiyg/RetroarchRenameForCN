@@ -11,7 +11,7 @@
 - 可以直接从[Releases](https://github.com/busiyg/RetroarchRenameForCN/releases)中下载打包好的exe，也可以自己配置环境运行源码
 ```bash
 pip install rapidfuzz pandas
-python ROM_Batch_Renamer.py
+python rom_rename_tool.py
 ```
 
 ## 平台
