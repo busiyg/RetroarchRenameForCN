@@ -1,0 +1,2 @@
+# RetroarchRenameForCN
+一个为中文Rom快速在Retroarch模拟器中获取游戏封面的方案
