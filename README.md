@@ -7,7 +7,7 @@
 ![Screenshot](Screenshot.png)
 
 ## 运行
-- 视频教程：[https://space.bilibili.com/332938511](https://www.bilibili.com/video/BV1oXWxzLEGi)
+- 视频教程：[B站](https://www.bilibili.com/video/BV1oXWxzLEGi)
 - 可以直接从[Releases](https://github.com/busiyg/RetroarchRenameForCN/releases)中下载打包好的exe，也可以自己配置环境运行源码
 ```bash
 pip install rapidfuzz pandas
