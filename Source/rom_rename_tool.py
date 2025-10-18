@@ -228,8 +228,7 @@ class RenamerApp:
             
             for item in lpl_data['items']:
                 original_label = item.get('label', '')
-                file_path = item.get('path', '')
-                _, ext = os.path.splitext(file_path)
+                _, ext = os.path.splitext(item.get('path', ''))
                 csv_path = get_csv_path_for_extension(ext)
                 
                 if not csv_path:
@@ -245,10 +244,8 @@ class RenamerApp:
                 best_match, best_score = None, 0
                 
                 for eng_name, cn_name in eng_to_cn.items():
-                    if cn_name:
-                        score = fuzz.token_set_ratio(cleaned_label, clean_filename(eng_name))
-                        if score > best_score:
-                            best_score, best_match = score, cn_name
+                    if cn_name and (score := fuzz.token_set_ratio(cleaned_label, clean_filename(eng_name))) > best_score:
+                        best_score, best_match = score, cn_name
                 
                 if best_match and best_score >= 85:
                     item['label'] = best_match
@@ -258,31 +255,41 @@ class RenamerApp:
                     skipped += 1
                     self.log_write(f"⊙ 保持原样: {original_label} ({best_score:.1f}, {csv_name})")
             
-            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-            os.makedirs(desktop_path, exist_ok=True)
-            original_filename = re.sub(r'\[\d+\](?=\.\w+$)', '', os.path.basename(lpl_path))
-            desktop_lpl_path = os.path.join(desktop_path, original_filename)
+            # 保存到桌面
+            desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+            os.makedirs(desktop, exist_ok=True)
+            save_name = os.path.basename(lpl_path)
+            # 删除文件名中的 [数字] 部分
+            if '[' in save_name and ']' in save_name:
+                start = save_name.rfind('[')
+                end = save_name.rfind(']')
+                if start < end and end < len(save_name) - 4:
+                    save_name = save_name[:start] + save_name[end+1:]
+            # 标准化文件名：将下划线格式转换为标准格式
+            save_name = save_name.replace('_-_', ' - ').replace('_', ' ')
+            save_path = os.path.join(desktop, save_name)
             
-            with open(desktop_lpl_path, 'w', encoding='utf-8') as f:
+            with open(save_path, 'w', encoding='utf-8') as f:
                 json.dump(lpl_data, f, ensure_ascii=False, indent=2)
             
             elapsed = time.time() - start_time
             self.log_write("=" * 70)
             self.log_write(f"完成! 总计: {total} | 已转换: {converted} | 保持原样: {skipped} | 无CSV映射: {no_csv}")
-            self.log_write(f"耗时: {elapsed:.1f}s | 已保存到桌面: {original_filename}")
-            self.log_write("请手动复制粘贴覆盖原 LPL 文件。")
+            self.log_write(f"耗时: {elapsed:.1f}s | 已保存到桌面: {save_name}")
+            self.log_write(f"请手动将桌面文件覆盖原lpl文件")
             if platform_stats:
-                self.log_write("使用的CSV统计:")
-                for csv_name, count in sorted(platform_stats.items()):
-                    self.log_write(f" • {csv_name}: {count} 个条目")
+                self.log_write("使用的CSV统计: " + ", ".join(f"{k}({v})" for k, v in sorted(platform_stats.items())))
         
         except json.JSONDecodeError as e:
             self.log_write(f"✗ JSON解析错误: {e}")
         except Exception as e:
             self.log_write(f"✗ 处理失败: {e}")
-            self.log_write(traceback.format_exc())
         finally:
             self._set_running(False)
+    
+    def run_renamer(self, folder, threshold):
+        # 这里需要添加你的 ROM 重命名逻辑
+        pass
 
 if __name__ == '__main__':
     root = Tk()
