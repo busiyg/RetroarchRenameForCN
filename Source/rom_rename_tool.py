@@ -164,7 +164,7 @@ def abbreviate_common_words(text):
     将Advance缩写为A以提高匹配准确度
     """
     # 使用单词边界匹配,避免误替换
-    result = re.sub(r'\bAdvance\b', 'A', text, flags=re.IGNORECASE)
+    result = re.sub(r'Advance', 'A', text, flags=re.IGNORECASE)
     return result
 
 def clean_filename(name):
