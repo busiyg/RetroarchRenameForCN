@@ -5,6 +5,7 @@ ROM Batch Renamer (GUI) - 动态CSV匹配版本
 - 支持混合平台ROM文件夹
 - LPL文件根据每个条目的文件扩展名单独匹配CSV
 - 自动在rom-name-cn-master目录查找对应CSV
+- 自动清理文件名开头的数字、符号、字母和空格
 依赖：
     pip install rapidfuzz pandas
 """
@@ -119,13 +120,68 @@ def contains_chinese(text):
     """检测文本是否包含中文字符"""
     return bool(re.search(r'[\u4e00-\u9fff]', text))
 
+def clean_filename_prefix(name):
+    """
+    清理文件名开头的数字、符号、字母和空格
+    例如: "0047 皇家骑士团" -> "皇家骑士团"
+          "H 换装迷宫" -> "换装迷宫"
+          "0689-换装迷宫" -> "换装迷宫"
+    规则：只有当字母是单个字母且后面有空格时才删除
+    """
+    # 找到第一个中文字符的位置
+    match = re.search(r'[\u4e00-\u9fff]', name)
+    if not match:
+        # 如果没有中文字符,返回原名
+        return name
+    
+    first_chinese_pos = match.start()
+    prefix = name[:first_chinese_pos]
+    
+    # 检查前缀最后一个字符是否是空格
+    if prefix and prefix[-1] == ' ':
+        # 去掉末尾空格后检查
+        prefix_without_space = prefix.rstrip()
+        # 如果去掉空格后最后一个字符是单个字母，则删除整个前缀
+        if prefix_without_space and len(prefix_without_space) >= 1:
+            last_char = prefix_without_space[-1]
+            if last_char.isalpha():
+                # 检查是否是单个字母(前面不是字母)
+                if len(prefix_without_space) == 1 or not prefix_without_space[-2].isalpha():
+                    # 是单个字母+空格，删除前缀
+                    return name[first_chinese_pos:]
+    
+    # 检查前缀是否全是非字母字符(数字、符号等)
+    has_alpha = any(c.isalpha() for c in prefix)
+    if not has_alpha:
+        # 没有字母，删除前缀
+        return name[first_chinese_pos:]
+    
+    # 其他情况保留原名
+    return name
+
+def abbreviate_common_words(text):
+    """
+    将Advance缩写为A以提高匹配准确度
+    """
+    # 使用单词边界匹配,避免误替换
+    result = re.sub(r'\bAdvance\b', 'A', text, flags=re.IGNORECASE)
+    return result
+
 def clean_filename(name):
     """深度清理文件名"""
+    # 先清理开头的前缀
+    name = clean_filename_prefix(name)
+    
+    # 再进行其他清理
     name = re.sub(r'\[.*?\]', '', name)
     name = re.sub(r'\(.*?\)', '', name)
     name = re.sub(r'[_\-\+]+', ' ', name)
     name = re.sub(r'\s+', ' ', name)
     name = name.strip()
+    
+    # 缩写常见单词
+    name = abbreviate_common_words(name)
+    
     return name
 
 def smart_match(query, choices, threshold):
@@ -215,7 +271,7 @@ class RenamerApp:
         self.threshold_entry = Entry(master, textvariable=self.threshold_var, width=8)
         self.threshold_entry.grid(row=2, column=1, sticky='w', padx=6, pady=6)
         
-        Label(master, text="(每个文件根据扩展名自动匹配对应CSV)", fg="gray").grid(
+        Label(master, text="(自动清理文件名前缀并匹配CSV)", fg="gray").grid(
             row=2, column=1, columnspan=2, sticky='e', padx=6
         )
         
@@ -324,7 +380,7 @@ class RenamerApp:
     def run_renamer(self, folder, threshold):
         start_time = time.time()
         self.log_write("=" * 70)
-        self.log_write(f"开始重命名ROM文件（每个文件动态匹配CSV）...")
+        self.log_write(f"开始重命名ROM文件（自动清理前缀并动态匹配CSV）...")
         self.log_write(f"ROM文件夹: {folder}")
         
         total = 0
@@ -363,6 +419,7 @@ class RenamerApp:
                 # 获取映射（使用缓存）
                 cn_to_eng, _, cn_list = self.csv_cache.get_mapping(csv_path)
                 
+                # 清理文件名（会自动移除前缀）
                 cleaned_name = clean_filename(name)
                 match, score = smart_match(cleaned_name, cn_list, threshold)
                 
@@ -379,11 +436,13 @@ class RenamerApp:
                     os.rename(src_path, new_path)
                     renamed += 1
                     self.log_write(f"✓ {filename}")
+                    self.log_write(f"  清理后: {cleaned_name}")
                     self.log_write(f"  → {new_filename}")
                     self.log_write(f"  [CSV: {csv_name}, 匹配: {match}, 分数: {score:.1f}]")
                 else:
                     skipped += 1
-                    self.log_write(f"✗ 跳过: {filename} (最高分:{score:.1f}, CSV: {csv_name})")
+                    self.log_write(f"✗ 跳过: {filename}")
+                    self.log_write(f"  清理后: {cleaned_name} (最高分:{score:.1f}, CSV: {csv_name})")
             except Exception as e:
                 errors += 1
                 self.log_write(f"✗ 错误: {filename} - {e}")
