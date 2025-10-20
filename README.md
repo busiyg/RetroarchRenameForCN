@@ -17,5 +17,8 @@ python rom_rename_tool.py
 ## 平台
 - FC,SFC,GB,GBC,GBA,NDS,3DS,New 3DS,Wii,Wii U,PS1,PSP
 
+## 注意
+- 不支持罗马数字，请改为阿拉伯数字，比如最终幻想IV,请改为最终幻想4
+
 ## 致谢
 https://github.com/yingw/rom-name-cn 项目提供的中文游戏名称数据库。
