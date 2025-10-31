@@ -463,7 +463,6 @@ class RenamerApp:
             
             # 保存到桌面
             desktop = Path.home() / "Desktop"
-            save_name = Path(xml_path).name.replace('.xml', '_CN.xml')
             save_path = desktop / save_name
             
             save_xml_playlist(tree, save_path)

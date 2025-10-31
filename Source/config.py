@@ -4,7 +4,7 @@ ROM Renamer - 配置文件
 """
 
 # 应用配置
-APP_TITLE = "ROM批量重命名工具 (动态CSV匹配版)"
+APP_TITLE = "中文ROM助手 1.3"
 CSV_ROOT_DIR = 'rom-name-cn-master'  # CSV文件根目录
 DEFAULT_THRESHOLD = 40  # 默认匹配阈值
 
