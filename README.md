@@ -1,5 +1,5 @@
 # 中文Rom助手（RetroarchRenameForCN）
-一个为中文Rom快速在Retroarch模拟器中获取游戏封面的方案
+一个为中文Rom快速在Retroarch模拟器,萤火虫系统中获取游戏封面的方案
 
 ## 功能
 - 把不规范中文名用模糊匹配翻译成官方英文名，在retroarch中就可以自动下载封面
