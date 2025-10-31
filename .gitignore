@@ -1,1 +1,2 @@
 *.exe
+Source/__pycache__/
