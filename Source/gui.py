@@ -306,6 +306,7 @@ class RenamerApp:
         self._log(f"总计: {stats['total']} | 成功: {stats['renamed']} | 跳过英文: {stats['english']}")
         self._log(f"未匹配: {stats['skipped']} | 错误扩展名: {stats['wrong_ext']} | 错误: {stats['errors']}")
         self._log(f"\n支持的扩展名: {', '.join(valid_extensions)}")
+        self._log(f"祝你玩的开心！🎮")
         
         self._finish()
     
