@@ -37,12 +37,12 @@ class RenamerApp:
     def _build_ui(self):
         """构建UI"""
         # 文件夹选择
-        Label(self.master, text="ROM 文件夹：").grid(row=0, column=0, sticky='w', padx=6, pady=6)
+        Label(self.master, text="ROM 文件夹:").grid(row=0, column=0, sticky='w', padx=6, pady=6)
         Entry(self.master, textvariable=self.folder_var, width=45).grid(row=0, column=1, padx=6, pady=6, columnspan=2)
         Button(self.master, text="浏览", command=lambda: self._browse(self.folder_var, True)).grid(row=0, column=3, padx=6)
         
         # 平台选择
-        Label(self.master, text="平台：").grid(row=0, column=4, sticky='w', padx=(20, 6), pady=6)
+        Label(self.master, text="平台:").grid(row=0, column=4, sticky='w', padx=(20, 6), pady=6)
         self.platform_combo = Combobox(self.master, textvariable=self.platform_var, 
                                        values=sorted(PLATFORM_CONFIG.keys()), 
                                        state='readonly', width=18)
@@ -50,38 +50,46 @@ class RenamerApp:
         self.platform_combo.set('')  # 默认为空
         
         # LPL选择
-        Label(self.master, text="LPL 播放列表：").grid(row=1, column=0, sticky='w', padx=6, pady=6)
+        Label(self.master, text="LPL 播放列表:").grid(row=1, column=0, sticky='w', padx=6, pady=6)
         Entry(self.master, textvariable=self.lpl_var, width=45).grid(row=1, column=1, padx=6, pady=6, columnspan=2)
         Button(self.master, text="浏览", command=lambda: self._browse(self.lpl_var, False, "lpl")).grid(row=1, column=3, padx=6)
         Button(self.master, text="转换LPL", command=self._start_lpl, width=10).grid(row=1, column=4, columnspan=2, padx=(20, 6), pady=6)
         
-        # XML选择（萤火虫）
-        Label(self.master, text="萤火虫列表：").grid(row=2, column=0, sticky='w', padx=6, pady=6)
+        # XML选择(萤火虫)
+        Label(self.master, text="萤火虫列表:").grid(row=2, column=0, sticky='w', padx=6, pady=6)
         Entry(self.master, textvariable=self.xml_var, width=45).grid(row=2, column=1, padx=6, pady=6, columnspan=2)
         Button(self.master, text="浏览", command=lambda: self._browse(self.xml_var, False, "xml")).grid(row=2, column=3, padx=6)
         Button(self.master, text="转换XML", command=self._start_xml, width=10).grid(row=2, column=4, columnspan=2, padx=(20, 6), pady=6)
         
         # 阈值设置
-        Label(self.master, text="匹配阈值 (0-100)：").grid(row=3, column=0, sticky='w', padx=6, pady=6)
+        Label(self.master, text="匹配阈值 (0-100):").grid(row=3, column=0, sticky='w', padx=6, pady=6)
         Entry(self.master, textvariable=self.threshold_var, width=8).grid(row=3, column=1, sticky='w', padx=6, pady=6)
         Label(self.master, text="(自动清理文件名前缀并匹配CSV)", fg="gray").grid(row=3, column=1, columnspan=3, sticky='e', padx=6)
         
-        # 操作按钮
-        self.preview_btn = Button(self.master, text="预览重命名效果", command=self._start_preview, width=18)
-        self.preview_btn.grid(row=4, column=0, padx=6, pady=6)
-        self.run_btn = Button(self.master, text="执行重命名", command=self._start_rename, width=15)
-        self.run_btn.grid(row=4, column=1, sticky='w', padx=6, pady=6)
-        Button(self.master, text="清空日志", command=self._clear_log, width=10).grid(row=4, column=3, padx=6, pady=6)
+        # 操作按钮 - 第一行
+        btn_frame1 = Frame(self.master)
+        btn_frame1.grid(row=4, column=0, columnspan=6, pady=(6, 3))
+        
+        self.preview_btn = Button(btn_frame1, text="预览中译英效果", command=self._start_preview, width=18)
+        self.preview_btn.pack(side='left', padx=3)
+        
+        self.run_btn = Button(btn_frame1, text="执行中译英", command=self._start_rename, width=18)
+        self.run_btn.pack(side='left', padx=3)
+        
+        self.eng_to_cn_btn = Button(btn_frame1, text="执行英译中", command=self._start_eng_to_cn, width=18)
+        self.eng_to_cn_btn.pack(side='left', padx=3)
+        
+        Button(btn_frame1, text="清空日志", command=self._clear_log, width=10).pack(side='left', padx=3)
         
         # 日志区域
-        Label(self.master, text="日志/进度：").grid(row=5, column=0, sticky='nw', padx=6, pady=6)
+        Label(self.master, text="日志/进度:").grid(row=5, column=0, sticky='nw', padx=6, pady=6)
         self.log = ScrolledText(self.master, width=100, height=20, state=DISABLED)
         self.log.grid(row=5, column=1, columnspan=5, padx=6, pady=6)
         
         # 作者信息
         author_frame = Frame(self.master)
         author_frame.grid(row=6, column=1, columnspan=5, pady=6)
-        Label(author_frame, text="作者：").pack(side='left')
+        Label(author_frame, text="作者:").pack(side='left')
         Button(author_frame, text="奇个旦", fg="blue", cursor="hand2", relief="flat",
                command=lambda: webbrowser.open("https://space.bilibili.com/332938511")).pack(side='left')
     
@@ -121,11 +129,12 @@ class RenamerApp:
             if not 0 <= threshold <= 100:
                 raise ValueError
         except:
-            self._log("错误：阈值需为0-100的整数")
+            self._log("错误:阈值需为0-100的整数")
             return
         
         self.run_btn.configure(state=DISABLED)
         self.preview_btn.configure(state=DISABLED)
+        self.eng_to_cn_btn.configure(state=DISABLED)
         self.running = True
         self.mapper.cache.clear()
         threading.Thread(target=callback, args=(*args, threshold), daemon=True).start()
@@ -136,33 +145,47 @@ class RenamerApp:
         platform = self.platform_var.get().strip()
         
         if not folder or not os.path.isdir(folder):
-            self._log("错误：请选择有效的ROM文件夹")
+            self._log("错误:请选择有效的ROM文件夹")
             return
         if not platform:
-            self._log("错误：请选择平台类型")
+            self._log("错误:请选择平台类型")
             return
         
         self._validate_and_start(self._preview_roms, folder, platform)
     
     def _start_rename(self):
-        """启动ROM重命名"""
+        """启动ROM重命名(中译英)"""
         folder = self.folder_var.get().strip()
         platform = self.platform_var.get().strip()
         
         if not folder or not os.path.isdir(folder):
-            self._log("错误：请选择有效的ROM文件夹")
+            self._log("错误:请选择有效的ROM文件夹")
             return
         if not platform:
-            self._log("错误：请选择平台类型")
+            self._log("错误:请选择平台类型")
             return
         
         self._validate_and_start(self._rename_roms, folder, platform)
+    
+    def _start_eng_to_cn(self):
+        """启动ROM重命名(英译中)"""
+        folder = self.folder_var.get().strip()
+        platform = self.platform_var.get().strip()
+        
+        if not folder or not os.path.isdir(folder):
+            self._log("错误:请选择有效的ROM文件夹")
+            return
+        if not platform:
+            self._log("错误:请选择平台类型")
+            return
+        
+        self._validate_and_start(self._rename_roms_eng_to_cn, folder, platform)
     
     def _start_lpl(self):
         """启动LPL转换"""
         lpl_path = self.lpl_var.get().strip()
         if not lpl_path or not os.path.exists(lpl_path):
-            self._log("错误：请选择有效的LPL文件")
+            self._log("错误:请选择有效的LPL文件")
             return
         self._validate_and_start(self._convert_lpl, lpl_path)
     
@@ -170,12 +193,12 @@ class RenamerApp:
         """启动XML转换"""
         xml_path = self.xml_var.get().strip()
         if not xml_path or not os.path.exists(xml_path):
-            self._log("错误：请选择有效的XML文件")
+            self._log("错误:请选择有效的XML文件")
             return
         self._validate_and_start(self._convert_xml, xml_path)
     
     def _preview_roms(self, folder, platform, threshold):
-        """预览重命名效果（不实际修改）"""
+        """预览重命名效果(不实际修改)"""
         from time import time
         start = time()
         self._log("=" * 70)
@@ -184,14 +207,14 @@ class RenamerApp:
         # 获取平台支持的扩展名
         valid_extensions = self.mapper.get_platform_extensions(platform)
         if not valid_extensions:
-            self._log(f"错误：未找到平台 {platform} 的配置")
+            self._log(f"错误:未找到平台 {platform} 的配置")
             self._finish()
             return
         
         # 获取CSV路径
         csv_path = self.mapper.get_csv_path(platform)
         if not csv_path:
-            self._log(f"错误：未找到平台 {platform} 的CSV文件")
+            self._log(f"错误:未找到平台 {platform} 的CSV文件")
             self._finish()
             return
         
@@ -238,27 +261,27 @@ class RenamerApp:
         self._log(f"总计: {stats['total']} | 将重命名: {stats['will_rename']} | 跳过英文: {stats['english']}")
         self._log(f"将跳过: {stats['skipped']} | 错误扩展名: {stats['wrong_ext']} | 错误: {stats['errors']}")
         self._log(f"\n支持的扩展名: {', '.join(valid_extensions)}")
-        self._log("\n⚡ 提示：如果预览效果满意，点击「执行重命名」按钮正式重命名文件")
+        self._log("\n⚡ 提示:如果预览效果满意,点击「执行重命名」按钮正式重命名文件")
         self._finish()
     
     def _rename_roms(self, folder, platform, threshold):
-        """重命名ROM文件"""
+        """重命名ROM文件(中译英)"""
         from time import time
         start = time()
         self._log("=" * 70)
-        self._log(f"开始重命名ROM文件... [平台: {platform}]")
+        self._log(f"开始重命名ROM文件(中译英)... [平台: {platform}]")
         
         # 获取平台支持的扩展名
         valid_extensions = self.mapper.get_platform_extensions(platform)
         if not valid_extensions:
-            self._log(f"错误：未找到平台 {platform} 的配置")
+            self._log(f"错误:未找到平台 {platform} 的配置")
             self._finish()
             return
         
         # 获取CSV路径
         csv_path = self.mapper.get_csv_path(platform)
         if not csv_path:
-            self._log(f"错误：未找到平台 {platform} 的CSV文件")
+            self._log(f"错误:未找到平台 {platform} 的CSV文件")
             self._finish()
             return
         
@@ -306,7 +329,79 @@ class RenamerApp:
         self._log(f"总计: {stats['total']} | 成功: {stats['renamed']} | 跳过英文: {stats['english']}")
         self._log(f"未匹配: {stats['skipped']} | 错误扩展名: {stats['wrong_ext']} | 错误: {stats['errors']}")
         self._log(f"\n支持的扩展名: {', '.join(valid_extensions)}")
-        self._log(f"祝你玩的开心！🎮")
+        self._log(f"祝你玩的开心!🎮")
+        
+        self._finish()
+    
+    def _rename_roms_eng_to_cn(self, folder, platform, threshold):
+        """重命名ROM文件(英译中)"""
+        from time import time
+        start = time()
+        self._log("=" * 70)
+        self._log(f"开始重命名ROM文件(英译中)... [平台: {platform}]")
+        
+        # 获取平台支持的扩展名
+        valid_extensions = self.mapper.get_platform_extensions(platform)
+        if not valid_extensions:
+            self._log(f"错误:未找到平台 {platform} 的配置")
+            self._finish()
+            return
+        
+        # 获取CSV路径
+        csv_path = self.mapper.get_csv_path(platform)
+        if not csv_path:
+            self._log(f"错误:未找到平台 {platform} 的CSV文件")
+            self._finish()
+            return
+        
+        stats = {'total': 0, 'renamed': 0, 'skipped': 0, 'chinese': 0, 'wrong_ext': 0, 'errors': 0}
+        
+        for filename in os.listdir(folder):
+            if not os.path.isfile(os.path.join(folder, filename)):
+                continue
+            
+            stats['total'] += 1
+            name, ext = os.path.splitext(filename)
+            
+            try:
+                # 检查扩展名是否匹配
+                if ext.lower() not in valid_extensions:
+                    stats['wrong_ext'] += 1
+                    continue
+                
+                # 跳过中文文件
+                if is_chinese_filename(name):
+                    stats['chinese'] += 1
+                    continue
+                
+                # 匹配并重命名(英译中)
+                mapping = self.mapper.load_mapping(csv_path)
+                cleaned = FileNameCleaner.clean(name)
+                
+                # 使用eng_to_cn映射
+                eng_list = list(mapping['eng_to_cn'].keys())
+                match, score = SmartMatcher.match(cleaned, eng_list, threshold)
+                
+                if match and (cn := mapping['eng_to_cn'].get(match)):
+                    new_name = generate_unique_filename(folder, cn + ext)
+                    os.rename(os.path.join(folder, filename), os.path.join(folder, new_name))
+                    stats['renamed'] += 1
+                    self._log(f"✓ {filename}\n  → {new_name}\n  [分数: {score:.1f}]")
+                else:
+                    stats['skipped'] += 1
+                    self._log(f"✗ 跳过: {filename} (分数:{score:.1f})")
+            
+            except Exception as e:
+                stats['errors'] += 1
+                self._log(f"✗ 错误: {filename} - {e}")
+        
+        # 输出统计
+        self._log("=" * 70)
+        self._log(f"完成! 耗时: {time()-start:.1f}s")
+        self._log(f"总计: {stats['total']} | 成功: {stats['renamed']} | 跳过中文: {stats['chinese']}")
+        self._log(f"未匹配: {stats['skipped']} | 错误扩展名: {stats['wrong_ext']} | 错误: {stats['errors']}")
+        self._log(f"\n支持的扩展名: {', '.join(valid_extensions)}")
+        self._log(f"祝你玩的开心!🎮")
         
         self._finish()
     
@@ -322,7 +417,7 @@ class RenamerApp:
                 lpl = json.load(f)
             
             if 'items' not in lpl:
-                self._log("✗ 错误：LPL格式不正确")
+                self._log("✗ 错误:LPL格式不正确")
                 self._finish()
                 return
             
@@ -464,6 +559,7 @@ class RenamerApp:
             
             # 保存到桌面
             desktop = Path.home() / "Desktop"
+            save_name = Path(xml_path).name
             save_path = desktop / save_name
             
             save_xml_playlist(tree, save_path)
@@ -488,6 +584,7 @@ class RenamerApp:
         self.running = False
         self.run_btn.configure(state=NORMAL)
         self.preview_btn.configure(state=NORMAL)
+        self.eng_to_cn_btn.configure(state=NORMAL)
 
 
 if __name__ == '__main__':
