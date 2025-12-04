@@ -25,3 +25,6 @@ python rom_rename_tool.py
 - https://github.com/yingw/rom-name-cn 中文游戏名称数据库
 - https://github.com/libretro/RetroArch 著名的全能模拟器
 - https://github.com/knulli-cfw/distribution 萤火虫开源系统
+
+## 给自己打个广告
+- https://store.steampowered.com/app/2827280/_/ 一人开发的大富翁类独立游戏，26年登录Steam，感兴趣的小伙伴加个愿望单吧~
