@@ -5,6 +5,7 @@
 - 把不规范中文名用模糊匹配翻译成官方英文名，在retroarch中就可以自动下载封面
 - 修改retroarch的lpl列表配置文件，将英文的label修改为标准中文名
 - 修改萤火虫（knull）系统的列表配置文件，将英文的label修改为标准中文名
+- 可以把修改后标准的英文名再改回标准中文名
 ![Screenshot](Screenshot.png)
 
 ## 运行
