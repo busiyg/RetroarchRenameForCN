@@ -28,4 +28,4 @@ python rom_rename_tool.py
 - https://github.com/knulli-cfw/distribution 萤火虫开源系统
 
 ## 给自己打个广告
-- https://store.steampowered.com/app/2827280/_/ 一人开发的大富翁类独立游戏，26年登录Steam，感兴趣的小伙伴加个愿望单吧~
+- [全金属炼狱](https://store.steampowered.com/app/4714080?utm_source=github) 个人独游，全职开发半年多
